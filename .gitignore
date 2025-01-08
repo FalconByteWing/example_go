@@ -1,0 +1,29 @@
+# Binary files
+**/bin/
+*.exe
+*.dll
+*.so
+*.dylib
+
+# Generated files
+**/generated/
+**/vendor/
+
+# IDE files
+.idea/
+.vscode/
+
+# Environment files
+.env
+*.env
+
+# Database
+*.db
+*.sqlite
+
+# Logs
+*.log
+
+# OS files
+.DS_Store
+Thumbs.db

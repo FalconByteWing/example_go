@@ -1,0 +1,228 @@
+swagger: "2.0"
+info:
+  title: TSP Payout Service Payout API
+  version: 1.0.0
+  description: API for handling payout operations
+host: localhost:8083
+basePath: /api/v1
+schemes:
+  - http
+  - https
+consumes:
+  - application/json
+produces:
+  - application/json
+
+definitions:
+  PayoutCreateRequest:
+    type: object
+    required:
+      - orderId
+      - bankName
+      - userId
+      - amount
+      - email
+      - phone
+      - ifscCode
+      - accountNo
+      - name
+      - notifyUrl
+    properties:
+      orderId:
+        type: string
+      bankName:
+        type: string
+      userId:
+        type: string
+      amount:
+        type: number
+        format: double
+        minimum: 0.01
+        description: "Amount should be a positive number with up to 2 decimal places"
+      email:
+        type: string
+        format: email
+      phone:
+        type: string
+      ifscCode:
+        type: string
+      accountNo:
+        type: string
+      name:
+        type: string
+      notifyUrl:
+        type: string
+        format: uri
+
+  PayoutStatusRequest:
+    type: object
+    required:
+      - orderId
+    properties:
+      orderId:
+        type: string
+
+  BalanceRequest:
+    type: object
+    required:
+      - merchant_id
+    properties:
+      merchant_id:
+        type: string
+        format: uuid
+
+  PayoutResponse:
+    type: object
+    properties:
+      status:
+        type: integer
+      message:
+        type: string
+      data:
+        type: object
+        properties:
+          status:
+            type: string
+          orderId:
+            type: string
+          message:
+            type: string
+
+  PayoutStatusResponse:
+    type: object
+    properties:
+      status:
+        type: integer
+      message:
+        type: string
+      data:
+        type: object
+        properties:
+          orderId:
+            type: integer
+          transactionId:
+            type: integer
+          amount:
+            type: number
+          status:
+            type: string
+          message:
+            type: string
+
+  BalanceResponse:
+    type: object
+    properties:
+      status:
+        type: integer
+      message:
+        type: string
+      data:
+        type: array
+        items:
+          type: object
+          properties:
+            status:
+              type: string
+            message:
+              type: string
+            balance:
+              type: number
+
+  Error:
+    type: object
+    properties:
+      code:
+        type: integer
+      message:
+        type: string
+
+paths:
+  /payout/create:
+    post:
+      tags:
+        - payout
+      summary: Create a new payout
+      operationId: createPayout
+      parameters:
+        - in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/PayoutCreateRequest"
+      responses:
+        200:
+          description: Payout created successfully
+          schema:
+            $ref: "#/definitions/PayoutResponse"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        403:
+          description: Forbidden
+          schema:
+            $ref: "#/definitions/Error"
+        422:
+          description: Validation Error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /payout/checkOrderStatus:
+    post:
+      tags:
+        - payout
+      summary: Check payout order status
+      operationId: checkOrderStatus
+      parameters:
+        - in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/PayoutStatusRequest"
+      responses:
+        200:
+          description: Order status retrieved successfully
+          schema:
+            $ref: "#/definitions/PayoutStatusResponse"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        403:
+          description: Forbidden
+          schema:
+            $ref: "#/definitions/Error"
+        422:
+          description: Validation Error
+          schema:
+            $ref: "#/definitions/Error"
+
+  /checkBalance:
+    get:
+      tags:
+        - payout
+      summary: Check merchant balance
+      operationId: checkBalance
+      parameters:
+        - in: query
+          name: merchant_id
+          required: true
+          type: string
+          format: uuid
+      responses:
+        200:
+          description: Balance retrieved successfully
+          schema:
+            $ref: "#/definitions/BalanceResponse"
+        401:
+          description: Unauthorized
+          schema:
+            $ref: "#/definitions/Error"
+        403:
+          description: Forbidden
+          schema:
+            $ref: "#/definitions/Error"
+        422:
+          description: Validation Error
+          schema:
+            $ref: "#/definitions/Error" 
